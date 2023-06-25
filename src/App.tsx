@@ -1,25 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Suspense, lazy, useEffect } from "react";
+import { Route, Routes, Link, BrowserRouter } from "react-router-dom";
+
+const MarkdownEditorPage = lazy(() => import("./MarkdownEditor"));
 
 function App() {
+
+    useEffect(() => {
+      const script = document.createElement('script');
+  
+      script.id = 'Cookiebot';
+      script.src = 'https://consent.cookiebot.com/uc.js';
+      script.type = 'text/javascript';
+      script.async = true;
+  
+      script.setAttribute('data-cbid', '123');
+      script.setAttribute('data-blockingmode', 'auto');
+
+      document.head.appendChild(script);
+  
+      return () => {
+        document.head.removeChild(script);
+      };
+    }, []);
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/markdown/new"
+          element={
+            <Suspense
+              fallback={
+                <div>Fallback content always rendered in produciton build</div>
+              }
+            >
+              <MarkdownEditorPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/"
+          element={<Link to="/markdown/new">Go to markdown page</Link>}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
